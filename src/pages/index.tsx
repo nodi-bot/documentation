@@ -2,197 +2,91 @@ import React from 'react';
 import clsx from 'clsx';
 import Link from '@docusaurus/Link';
 import Head from '@docusaurus/Head';
-import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
 
+import {useLocale, useTranslation, type Locale} from '../i18n/useTranslation';
+import {homepage} from '../i18n/content/homepage';
 import styles from './index.module.css';
 
 const SALES_EMAIL = 'sales@tictactrip.eu';
 const DEV_EMAIL = 'dev@tictactrip.eu';
+const SITE_URL = 'https://api.tictactrip.eu';
 
-type Feature = {
-  title: string;
-  description: string;
-  icon: string;
-  slug: string;
+const OG_LOCALE: Record<Locale, string> = {
+  en: 'en_US',
+  fr: 'fr_FR',
+  de: 'de_DE',
+  es: 'es_ES',
+  it: 'it_IT',
+  pt: 'pt_PT',
+  ru: 'ru_RU',
 };
 
-const FEATURES: Feature[] = [
-  {
-    icon: '🚆',
-    title: 'Multimodal coverage',
-    description:
-      'A single API to search, compare and book trains, buses and their combinations across Europe — SNCF, Trenitalia, FlixBus, BlaBlaCar Bus, Renfe and more.',
-    slug: '/features/multimodal-coverage',
-  },
-  {
-    icon: '🌍',
-    title: 'Eco-responsible by design',
-    description:
-      'Every itinerary returns its CO₂ footprint so your users can pick the lowest-emission option. Built for sustainable travel platforms and corporate ESG reporting.',
-    slug: '/features/eco-responsible',
-  },
-  {
-    icon: '⚡',
-    title: 'Real-time availability',
-    description:
-      'Live pricing, seat availability and fare classes refreshed in real time. No stale inventory, no failed bookings.',
-    slug: '/features/real-time-availability',
-  },
-  {
-    icon: '🔁',
-    title: 'Smart combinations',
-    description:
-      'Our routing engine assembles train and bus legs into a single itinerary when a direct journey is not available — the unique Tictactrip value.',
-    slug: '/features/smart-combinations',
-  },
-  {
-    icon: '🎫',
-    title: 'End-to-end booking',
-    description:
-      'Search, reserve, pay and issue tickets through one REST API. Tickets are delivered as PDF, ready to email, print or embed in your own product.',
-    slug: '/features/end-to-end-booking',
-  },
-  {
-    icon: '🛠️',
-    title: 'Developer-first',
-    description:
-      'Clean REST endpoints, OpenAPI specification, Postman collection and step-by-step tutorials. Ship your integration in days, not months.',
-    slug: '/features/developer-first',
-  },
+const SCHEMA_LANG: Record<Locale, string> = {
+  en: 'en',
+  fr: 'fr',
+  de: 'de',
+  es: 'es',
+  it: 'it',
+  pt: 'pt',
+  ru: 'ru',
+};
+
+const FEATURE_SLUGS = [
+  '/features/multimodal-coverage',
+  '/features/eco-responsible',
+  '/features/real-time-availability',
+  '/features/smart-combinations',
+  '/features/end-to-end-booking',
+  '/features/developer-first',
 ];
 
-type UseCase = {
-  title: string;
-  description: string;
-  slug: string;
-};
-
-const USE_CASES: UseCase[] = [
-  {
-    title: 'Online Travel Agencies (OTA)',
-    description:
-      'Add ground transport inventory to your air-and-hotel offering. Sell European rail and bus without negotiating with every carrier.',
-    slug: '/solutions/online-travel-agencies',
-  },
-  {
-    title: 'Corporate travel & TMC',
-    description:
-      'Power your business-travel platform with multimodal itineraries and CO₂ reporting that fit your sustainability mandate.',
-    slug: '/solutions/corporate-travel-tmc',
-  },
-  {
-    title: 'Fintech & super-apps',
-    description:
-      'Embed travel booking inside neobanks, loyalty apps and mobility wallets with a single integration.',
-    slug: '/solutions/fintech-super-apps',
-  },
-  {
-    title: 'Mobility & MaaS platforms',
-    description:
-      'Complement urban mobility (scooters, car-share, transit) with long-distance trains and buses to offer true door-to-door journeys.',
-    slug: '/solutions/mobility-maas',
-  },
-  {
-    title: 'Green-tech & sustainability',
-    description:
-      'Build climate-aware travel tools, employee commuting platforms or carbon-budget products on top of verified CO₂ data.',
-    slug: '/solutions/green-tech-sustainability',
-  },
-  {
-    title: 'Custom & internal tools',
-    description:
-      'Procurement teams, universities, NGOs and event organisers use our API to centralise travel purchasing.',
-    slug: '/solutions/custom-internal-tools',
-  },
-];
-
-type FaqItem = {
-  q: string;
-  a: string;
-};
-
-const FAQ: FaqItem[] = [
-  {
-    q: 'What is the Tictactrip API?',
-    a: 'The Tictactrip API is a REST interface that lets developers search, compare and book trains and buses across Europe — including multimodal combinations of several carriers in a single itinerary.',
-  },
-  {
-    q: 'How do I get access to the Tictactrip API?',
-    a: `Access to the production API is granted on request. Contact our sales team at ${SALES_EMAIL} to discuss your use case, sign a commercial agreement and receive your authentication token.`,
-  },
-  {
-    q: 'Which carriers and countries are covered?',
-    a: 'The API aggregates major European rail and bus operators including SNCF, Trenitalia, Renfe, FlixBus, BlaBlaCar Bus, ALSA, Ouigo and many regional carriers. Coverage extends across France, Italy, Spain, Germany, Benelux and the rest of continental Europe.',
-  },
-  {
-    q: 'How is the API priced?',
-    a: `Pricing depends on volume, transaction type and the carriers you need. Contact ${SALES_EMAIL} to receive a tailored commercial proposal.`,
-  },
-  {
-    q: 'Do you provide CO₂ emissions data?',
-    a: 'Yes. Every itinerary returned by the search endpoint includes the estimated CO₂ footprint per passenger, which makes it easy to surface the most eco-responsible option in your product.',
-  },
-  {
-    q: 'How long does integration take?',
-    a: 'Most partners go live in 2 to 6 weeks. The API exposes a clean REST surface, an OpenAPI specification and a ready-to-use Postman collection so engineering teams can prototype on day one.',
-  },
-  {
-    q: 'In which formats are tickets delivered?',
-    a: 'Tickets are issued as PDFs that you can email to travellers, print, or render inside your own product.',
-  },
-  {
-    q: 'Is the API GDPR-compliant?',
-    a: 'Yes. Tictactrip is a French company and the API is operated in compliance with the GDPR. Passenger data is processed strictly for the purpose of issuing the requested transport tickets.',
-  },
+const USE_CASE_SLUGS = [
+  '/solutions/online-travel-agencies',
+  '/solutions/corporate-travel-tmc',
+  '/solutions/fintech-super-apps',
+  '/solutions/mobility-maas',
+  '/solutions/green-tech-sustainability',
+  '/solutions/custom-internal-tools',
 ];
 
 function HomepageHeader() {
-  const {siteConfig} = useDocusaurusContext();
+  const t = useTranslation(homepage);
   return (
     <header className={clsx('hero', styles.heroBanner)}>
       <div className={styles.heroOverlay} />
       <div className={clsx('container', styles.heroContent)}>
-        <span className={styles.heroEyebrow}>Tictactrip Developer Platform</span>
+        <span className={styles.heroEyebrow}>{t.hero.eyebrow}</span>
         <h1 className={styles.heroTitle}>
-          One API for European <span className={styles.heroAccent}>trains, buses</span> and their combinations
+          {t.hero.titlePre}
+          <span className={styles.heroAccent}>{t.hero.titleAccent}</span>
+          {t.hero.titlePost}
         </h1>
-        <p className={styles.heroSubtitle}>
-          Search, compare and book multimodal long-distance journeys across Europe.
-          Real-time inventory, CO₂ footprint included, ticket delivery built in.
-        </p>
+        <p className={styles.heroSubtitle}>{t.hero.subtitle}</p>
         <div className={styles.heroButtons}>
-          <Link
-            className={clsx('button button--lg', styles.btnPrimary)}
-            to="/docs/intro">
-            Read the API tutorial
+          <Link className={clsx('button button--lg', styles.btnPrimary)} to="/docs/intro">
+            {t.hero.primaryCta}
           </Link>
           <Link
             className={clsx('button button--lg', styles.btnSecondary)}
             to={`mailto:${SALES_EMAIL}?subject=Tictactrip%20API%20access%20request`}>
-            Request API access
+            {t.hero.secondaryCta}
           </Link>
         </div>
         <p className={styles.heroNote}>
-          API access is granted on request. Contact{' '}
+          {t.hero.notePre}
           <a href={`mailto:${SALES_EMAIL}`} className={styles.heroLink}>
             {SALES_EMAIL}
-          </a>{' '}
-          to get started.
+          </a>
+          {t.hero.notePost}
         </p>
         <div className={styles.heroStats}>
-          <div className={styles.heroStat}>
-            <strong>250+</strong>
-            <span>carriers integrated</span>
-          </div>
-          <div className={styles.heroStat}>
-            <strong>20+</strong>
-            <span>European countries</span>
-          </div>
-          <div className={styles.heroStat}>
-            <strong>1 API</strong>
-            <span>train · bus</span>
-          </div>
+          {t.hero.stats.map((s) => (
+            <div key={s.label} className={styles.heroStat}>
+              <strong>{s.value}</strong>
+              <span>{s.label}</span>
+            </div>
+          ))}
         </div>
       </div>
       <div className={styles.scrollHint} aria-hidden="true">
@@ -203,32 +97,21 @@ function HomepageHeader() {
 }
 
 function IntroSection() {
+  const t = useTranslation(homepage);
   return (
     <section className={clsx(styles.section, styles.sectionLight)}>
       <div className="container">
         <div className={styles.introGrid}>
           <div>
-            <h2 className={styles.sectionTitle}>
-              What is the Tictactrip API?
-            </h2>
-            <p className={styles.lead}>
-              <strong>Tictactrip</strong> is a European distribution platform for long-distance
-              ground transport. Our API gives you programmatic access to{' '}
-              <strong>train and bus inventory</strong> from hundreds of carriers, plus a
-              proprietary routing engine that <strong>combines several operators into a single
-              itinerary</strong> when no direct option exists.
-            </p>
-            <p className={styles.lead}>
-              You integrate once. We handle carrier contracts, ticketing, payments,
-              CO₂ computation and after-sales operations.
-            </p>
+            <h2 className={styles.sectionTitle}>{t.intro.h2}</h2>
+            <div className={styles.introCopy}>{t.intro.intro}</div>
           </div>
           <ul className={styles.bulletList}>
-            <li><strong>Trains</strong> — high-speed, intercity and regional rail</li>
-            <li><strong>Buses</strong> — long-distance carriers across Europe</li>
-            <li><strong>Combinations</strong> — multi-leg, multi-operator itineraries</li>
-            <li><strong>CO₂ data</strong> — emissions per passenger, per leg</li>
-            <li><strong>End-to-end booking</strong> — search, reserve, pay, ticket</li>
+            {t.intro.bullets.map((b) => (
+              <li key={b.label}>
+                <strong>{b.label}</strong> — {b.description}
+              </li>
+            ))}
           </ul>
         </div>
       </div>
@@ -237,24 +120,23 @@ function IntroSection() {
 }
 
 function FeaturesSection() {
+  const t = useTranslation(homepage);
   return (
     <section className={clsx(styles.section, styles.sectionAlt)} id="features">
       <div className="container">
-        <h2 className={styles.sectionTitle}>Everything you need to ship travel features</h2>
-        <p className={styles.sectionSubtitle}>
-          A production-grade REST API used by travel agencies, fintechs and sustainability platforms.
-        </p>
+        <h2 className={styles.sectionTitle}>{t.features.h2}</h2>
+        <p className={styles.sectionSubtitle}>{t.features.subtitle}</p>
         <div className={styles.featureGrid}>
-          {FEATURES.map((f, i) => (
+          {t.features.cards.map((f, i) => (
             <Link
               key={f.title}
-              to={f.slug}
+              to={FEATURE_SLUGS[i]}
               className={styles.featureCard}
               style={{animationDelay: `${i * 80}ms`}}>
               <div className={styles.featureIcon} aria-hidden="true">{f.icon}</div>
               <h3 className={styles.featureTitle}>{f.title}</h3>
               <p className={styles.featureDescription}>{f.description}</p>
-              <span className={styles.featureLink}>Learn more →</span>
+              <span className={styles.featureLink}>{t.features.learnMore}</span>
             </Link>
           ))}
         </div>
@@ -264,40 +146,26 @@ function FeaturesSection() {
 }
 
 function QuickStartSection() {
+  const t = useTranslation(homepage);
   return (
     <section className={clsx(styles.section, styles.sectionLight)}>
       <div className="container">
         <div className={styles.quickStartGrid}>
           <div>
-            <span className={styles.kicker}>Quick start</span>
-            <h2 className={styles.sectionTitle}>From zero to first booking in 4 calls</h2>
-            <p className={styles.lead}>
-              Authenticate, resolve origin and destination, search itineraries, then book.
-              Our <Link to="/docs/intro">step-by-step tutorial</Link> walks through every
-              endpoint with curl examples and a ready-to-use{' '}
-              <a href="/Tictactrip.postman_collection.json">Postman collection</a>.
-            </p>
+            <span className={styles.kicker}>{t.quickStart.kicker}</span>
+            <h2 className={styles.sectionTitle}>{t.quickStart.h2}</h2>
+            <p className={styles.lead}>{t.quickStart.lead}</p>
             <ol className={styles.numberedList}>
-              <li>
-                Request your <strong>authentication token</strong> from {' '}
-                <a href={`mailto:${SALES_EMAIL}`}>{SALES_EMAIL}</a>
-              </li>
-              <li>
-                Resolve city IDs via <code>GET /v2/stopClusters</code>
-              </li>
-              <li>
-                Search itineraries via <code>POST /v2/results</code>
-              </li>
-              <li>
-                Book and issue tickets via <code>POST /book</code>
-              </li>
+              {t.quickStart.steps.map((step, i) => (
+                <li key={i}>{step}</li>
+              ))}
             </ol>
             <div className={styles.quickStartCtas}>
               <Link className={clsx('button button--lg', styles.btnPrimary)} to="/docs/intro">
-                Start the tutorial
+                {t.quickStart.primaryCta}
               </Link>
               <Link className={clsx('button button--lg', styles.btnGhost)} to="/api">
-                Browse the API reference
+                {t.quickStart.secondaryCta}
               </Link>
             </div>
           </div>
@@ -331,19 +199,18 @@ curl -X POST 'https://api.tictactrip.eu/v2/results' \\
 }
 
 function UseCasesSection() {
+  const t = useTranslation(homepage);
   return (
-    <section className={clsx(styles.section, styles.sectionAlt)}>
+    <section className={clsx(styles.section, styles.sectionAlt)} id="use-cases">
       <div className="container">
-        <h2 className={styles.sectionTitle}>Built for the teams reinventing travel</h2>
-        <p className={styles.sectionSubtitle}>
-          Whether you sell trips, manage corporate travel or build climate-tech, the API fits in.
-        </p>
+        <h2 className={styles.sectionTitle}>{t.useCases.h2}</h2>
+        <p className={styles.sectionSubtitle}>{t.useCases.subtitle}</p>
         <div className={styles.useCaseGrid}>
-          {USE_CASES.map((u) => (
-            <Link key={u.title} to={u.slug} className={styles.useCaseCard}>
+          {t.useCases.cards.map((u, i) => (
+            <Link key={u.title} to={USE_CASE_SLUGS[i]} className={styles.useCaseCard}>
               <h3 className={styles.useCaseTitle}>{u.title}</h3>
               <p className={styles.useCaseDescription}>{u.description}</p>
-              <span className={styles.useCaseLink}>Learn more →</span>
+              <span className={styles.useCaseLink}>{t.useCases.learnMore}</span>
             </Link>
           ))}
         </div>
@@ -353,35 +220,27 @@ function UseCasesSection() {
 }
 
 function AccessSection() {
+  const t = useTranslation(homepage);
   return (
     <section className={clsx(styles.section, styles.sectionAccess)}>
       <div className="container">
         <div className={styles.accessCard}>
-          <span className={styles.kicker}>Get API access</span>
-          <h2 className={styles.accessTitle}>
-            Talk to our team to unlock the Tictactrip API
-          </h2>
-          <p className={styles.accessLead}>
-            API access is granted after a short commercial discussion to match the right
-            plan, carriers and SLA to your project. Send us a note about your use case and
-            we'll come back to you within one business day.
-          </p>
+          <span className={styles.kicker}>{t.access.kicker}</span>
+          <h2 className={styles.accessTitle}>{t.access.h2}</h2>
+          <p className={styles.accessLead}>{t.access.lead}</p>
           <div className={styles.accessActions}>
             <a
               className={clsx('button button--lg', styles.btnPrimary)}
               href={`mailto:${SALES_EMAIL}?subject=Tictactrip%20API%20access%20request`}>
-              Email sales@tictactrip.eu
+              {t.access.primaryCta}
             </a>
             <a
               className={clsx('button button--lg', styles.btnGhost)}
               href={`mailto:${DEV_EMAIL}?subject=Tictactrip%20API%20technical%20question`}>
-              Technical question? {DEV_EMAIL}
+              {t.access.secondaryCta} {DEV_EMAIL}
             </a>
           </div>
-          <p className={styles.accessFinePrint}>
-            Already a partner? Use your existing token to authenticate against{' '}
-            <code>https://api.tictactrip.eu</code>.
-          </p>
+          <p className={styles.accessFinePrint}>{t.access.finePrint}</p>
         </div>
       </div>
     </section>
@@ -389,15 +248,14 @@ function AccessSection() {
 }
 
 function FaqSection() {
+  const t = useTranslation(homepage);
   return (
     <section className={clsx(styles.section, styles.sectionLight)} id="faq">
       <div className="container">
-        <h2 className={styles.sectionTitle}>Frequently asked questions</h2>
-        <p className={styles.sectionSubtitle}>
-          Everything developers and product teams ask before integrating.
-        </p>
+        <h2 className={styles.sectionTitle}>{t.faq.h2}</h2>
+        <p className={styles.sectionSubtitle}>{t.faq.subtitle}</p>
         <div className={styles.faqList}>
-          {FAQ.map((item) => (
+          {t.faq.items.map((item) => (
             <details key={item.q} className={styles.faqItem}>
               <summary className={styles.faqQuestion}>{item.q}</summary>
               <p className={styles.faqAnswer}>{item.a}</p>
@@ -410,23 +268,20 @@ function FaqSection() {
 }
 
 function FinalCtaSection() {
+  const t = useTranslation(homepage);
   return (
     <section className={clsx(styles.section, styles.sectionFinalCta)}>
       <div className="container">
-        <h2 className={styles.finalCtaTitle}>
-          Ready to ship multimodal travel?
-        </h2>
-        <p className={styles.finalCtaLead}>
-          Read the tutorial, browse the reference, or talk to sales — your call.
-        </p>
+        <h2 className={styles.finalCtaTitle}>{t.finalCta.h2}</h2>
+        <p className={styles.finalCtaLead}>{t.finalCta.lead}</p>
         <div className={styles.heroButtons}>
           <Link className={clsx('button button--lg', styles.btnPrimary)} to="/docs/intro">
-            Read the docs
+            {t.finalCta.primaryCta}
           </Link>
           <a
             className={clsx('button button--lg', styles.btnSecondary)}
             href={`mailto:${SALES_EMAIL}?subject=Tictactrip%20API%20access%20request`}>
-            Contact sales
+            {t.finalCta.secondaryCta}
           </a>
         </div>
       </div>
@@ -435,30 +290,32 @@ function FinalCtaSection() {
 }
 
 function StructuredData() {
+  const locale = useLocale();
+  const t = useTranslation(homepage);
+  const localePrefix = locale === 'en' ? '' : `/${locale}`;
+  const canonical = `${SITE_URL}${localePrefix}/`;
+
   const organization = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: 'Tictactrip',
     url: 'https://www.tictactrip.eu/',
     logo: 'https://api.tictactrip.eu/img/logoTextBlack.svg',
-    sameAs: [
-      'https://www.tictactrip.eu/',
-      'https://github.com/tictactrip',
-    ],
+    sameAs: ['https://www.tictactrip.eu/', 'https://github.com/tictactrip'],
     contactPoint: [
       {
         '@type': 'ContactPoint',
         email: SALES_EMAIL,
         contactType: 'sales',
         areaServed: 'EU',
-        availableLanguage: ['English', 'French'],
+        availableLanguage: ['English', 'French', 'German', 'Spanish', 'Italian', 'Portuguese', 'Russian'],
       },
       {
         '@type': 'ContactPoint',
         email: DEV_EMAIL,
         contactType: 'technical support',
         areaServed: 'EU',
-        availableLanguage: ['English', 'French'],
+        availableLanguage: ['English', 'French', 'German', 'Spanish', 'Italian', 'Portuguese', 'Russian'],
       },
     ],
   };
@@ -467,8 +324,7 @@ function StructuredData() {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: 'Tictactrip API',
-    description:
-      'REST API to search, compare and book trains and buses across Europe, including multimodal combinations and CO₂ emissions per itinerary.',
+    description: t.meta.description,
     brand: {'@type': 'Brand', name: 'Tictactrip'},
     category: 'Travel API / Transport API',
     audience: {
@@ -478,10 +334,24 @@ function StructuredData() {
     },
   };
 
+  const webpage = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: t.meta.title,
+    description: t.meta.description,
+    url: canonical,
+    inLanguage: SCHEMA_LANG[locale],
+    isPartOf: {
+      '@type': 'WebSite',
+      name: 'Tictactrip Documentation',
+      url: `${SITE_URL}/`,
+    },
+  };
+
   const faqLd = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
-    mainEntity: FAQ.map((item) => ({
+    mainEntity: t.faq.items.map((item) => ({
       '@type': 'Question',
       name: item.q,
       acceptedAnswer: {
@@ -493,21 +363,16 @@ function StructuredData() {
 
   return (
     <Head>
-      <meta
-        name="description"
-        content="Tictactrip API — One REST API to search, compare and book European trains, buses and their combinations. Multimodal itineraries across 250+ carriers, real-time inventory, CO₂ emissions and end-to-end ticketing. Contact sales@tictactrip.eu to get access."
-      />
-      <meta
-        name="keywords"
-        content="train API, bus API, European travel API, multimodal travel API, rail booking API, SNCF API, FlixBus API, Trenitalia API, Renfe API, CO2 travel API, sustainable travel API, Tictactrip API"
-      />
+      <link rel="canonical" href={canonical} />
+      <meta name="description" content={t.meta.description} />
+      <meta name="keywords" content={t.meta.keywords} />
       <meta property="og:type" content="website" />
-      <meta property="og:title" content="Tictactrip Documentation — Train & bus booking API for Europe" />
-      <meta
-        property="og:description"
-        content="One REST API for European trains, buses and their combinations. 250+ carriers, real-time inventory, CO₂ data, end-to-end ticketing. Request API access at sales@tictactrip.eu."
-      />
+      <meta property="og:title" content={t.meta.ogTitle} />
+      <meta property="og:description" content={t.meta.ogDescription} />
+      <meta property="og:url" content={canonical} />
+      <meta property="og:locale" content={OG_LOCALE[locale]} />
       <meta name="twitter:card" content="summary_large_image" />
+      <script type="application/ld+json">{JSON.stringify(webpage)}</script>
       <script type="application/ld+json">{JSON.stringify(organization)}</script>
       <script type="application/ld+json">{JSON.stringify(product)}</script>
       <script type="application/ld+json">{JSON.stringify(faqLd)}</script>
@@ -516,10 +381,9 @@ function StructuredData() {
 }
 
 export default function Home(): JSX.Element {
+  const t = useTranslation(homepage);
   return (
-    <Layout
-      title="Tictactrip API — Train & bus booking API for Europe"
-      description="One REST API to search, compare and book European trains, buses and their combinations. 250+ carriers, multimodal itineraries, real-time inventory, CO₂ emissions and end-to-end ticketing. Contact sales@tictactrip.eu to get access.">
+    <Layout title={t.meta.title} description={t.meta.description}>
       <StructuredData />
       <main className={styles.main}>
         <HomepageHeader />

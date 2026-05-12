@@ -24,7 +24,16 @@ const config = {
   // to replace "en" with "zh-Hans".
   i18n: {
     defaultLocale: 'en',
-    locales: ['en'],
+    locales: ['en', 'fr', 'de', 'es', 'it', 'pt', 'ru'],
+    localeConfigs: {
+      en: {label: 'English', direction: 'ltr', htmlLang: 'en-US'},
+      fr: {label: 'Français', direction: 'ltr', htmlLang: 'fr-FR'},
+      de: {label: 'Deutsch', direction: 'ltr', htmlLang: 'de-DE'},
+      es: {label: 'Español', direction: 'ltr', htmlLang: 'es-ES'},
+      it: {label: 'Italiano', direction: 'ltr', htmlLang: 'it-IT'},
+      pt: {label: 'Português', direction: 'ltr', htmlLang: 'pt-PT'},
+      ru: {label: 'Русский', direction: 'ltr', htmlLang: 'ru-RU'},
+    },
   },
 
   presets: [
@@ -53,6 +62,9 @@ const config = {
           trackingID: 'G-RQEHKSPQ6Z',
           anonymizeIP: true,
         },
+        // Disable the built-in single-locale sitemap; we ship a custom
+        // multilingual sitemap with hreflang via plugins/multilingual-sitemap.js
+        sitemap: false,
       }),
     ],
     // Redocusaurus config
@@ -74,6 +86,12 @@ const config = {
     ],
   ],
 
+  plugins: [
+    // Custom multilingual sitemap — overwrites the default sitemap.xml
+    // with one URL per (page × locale) plus hreflang alternates.
+    require.resolve('./plugins/multilingual-sitemap.js'),
+  ],
+
   themeConfig:
   /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
       ({
@@ -90,6 +108,10 @@ const config = {
               label: 'Docs',
             },
             {to: '/api', label: 'Api', position: 'left'},
+            {
+              type: 'localeDropdown',
+              position: 'right',
+            },
             {
               href: 'https://github.com/tictactrip/documentation',
               label: 'GitHub',

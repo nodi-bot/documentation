@@ -4,10 +4,32 @@ import Link from '@docusaurus/Link';
 import Head from '@docusaurus/Head';
 import Layout from '@theme/Layout';
 
+import {useLocale, useTranslation, type Locale} from '../i18n/useTranslation';
+import {solutionShell} from '../i18n/content/solutionShell';
 import styles from './SolutionPage.module.css';
 
 const SALES_EMAIL = 'sales@tictactrip.eu';
 const SITE_URL = 'https://api.tictactrip.eu';
+
+const OG_LOCALE: Record<Locale, string> = {
+  en: 'en_US',
+  fr: 'fr_FR',
+  de: 'de_DE',
+  es: 'es_ES',
+  it: 'it_IT',
+  pt: 'pt_PT',
+  ru: 'ru_RU',
+};
+
+const SCHEMA_LANG: Record<Locale, string> = {
+  en: 'en',
+  fr: 'fr',
+  de: 'de',
+  es: 'es',
+  it: 'it',
+  pt: 'pt',
+  ru: 'ru',
+};
 
 export type SolutionFaq = {
   q: string;
@@ -41,21 +63,21 @@ export type SolutionPageProps = {
   serviceType: string;
   audienceType: string;
   related: Array<{title: string; slug: string}>;
-  /** Breadcrumb category. Defaults to "Solutions". */
   breadcrumbCategory?: string;
-  /** Href for the breadcrumb category link. Defaults to "/#use-cases". */
   breadcrumbCategoryHref?: string;
-  /** Override the "Why Tictactrip for ..." section heading. */
   benefitsHeading?: string;
-  /** Override the "Other Tictactrip solutions" related-cards heading. */
   relatedHeading?: string;
 };
 
 export default function SolutionPage(props: SolutionPageProps): JSX.Element {
-  const canonical = `${SITE_URL}${props.slug}`;
+  const locale = useLocale();
+  const shell = useTranslation(solutionShell);
+  const localePrefix = locale === 'en' ? '' : `/${locale}`;
+  const canonical = `${SITE_URL}${localePrefix}${props.slug}`;
   const breadcrumbCategory = props.breadcrumbCategory ?? 'Solutions';
   const breadcrumbCategoryHref = props.breadcrumbCategoryHref ?? '/#use-cases';
-  const benefitsHeading = props.benefitsHeading ?? `Why Tictactrip for ${props.title.toLowerCase()}`;
+  const benefitsHeading =
+    props.benefitsHeading ?? `Why Tictactrip for ${props.title.toLowerCase()}`;
   const relatedHeading = props.relatedHeading ?? 'Other Tictactrip solutions';
 
   const breadcrumb = {
@@ -66,13 +88,13 @@ export default function SolutionPage(props: SolutionPageProps): JSX.Element {
         '@type': 'ListItem',
         position: 1,
         name: 'Tictactrip',
-        item: `${SITE_URL}/`,
+        item: `${SITE_URL}${localePrefix}/`,
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: breadcrumbCategory,
-        item: `${SITE_URL}${breadcrumbCategoryHref}`,
+        item: `${SITE_URL}${localePrefix}${breadcrumbCategoryHref}`,
       },
       {
         '@type': 'ListItem',
@@ -121,7 +143,7 @@ export default function SolutionPage(props: SolutionPageProps): JSX.Element {
       name: 'Tictactrip Documentation',
       url: `${SITE_URL}/`,
     },
-    inLanguage: 'en',
+    inLanguage: SCHEMA_LANG[locale],
     primaryImageOfPage: {
       '@type': 'ImageObject',
       url: `${SITE_URL}/img/logoTextBlack.svg`,
@@ -150,7 +172,7 @@ export default function SolutionPage(props: SolutionPageProps): JSX.Element {
         <meta property="og:description" content={props.metaDescription} />
         <meta property="og:url" content={canonical} />
         <meta property="og:site_name" content="Tictactrip Documentation" />
-        <meta property="og:locale" content="en_US" />
+        <meta property="og:locale" content={OG_LOCALE[locale]} />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={props.metaTitle} />
         <meta name="twitter:description" content={props.metaDescription} />
@@ -161,7 +183,7 @@ export default function SolutionPage(props: SolutionPageProps): JSX.Element {
       </Head>
 
       <main className={styles.main}>
-        <nav className={styles.breadcrumb} aria-label="Breadcrumb">
+        <nav className={styles.breadcrumb} aria-label={shell.breadcrumbAriaLabel}>
           <div className="container">
             <ol>
               <li>
@@ -184,12 +206,12 @@ export default function SolutionPage(props: SolutionPageProps): JSX.Element {
             <p className={styles.heroLead}>{props.heroLead}</p>
             <div className={styles.heroCtas}>
               <Link className={clsx('button button--lg', styles.btnPrimary)} to="/docs/intro">
-                Read the API tutorial
+                {shell.heroPrimaryCta}
               </Link>
               <a
                 className={clsx('button button--lg', styles.btnSecondary)}
                 href={`mailto:${SALES_EMAIL}?subject=Tictactrip%20API%20-%20${encodeURIComponent(props.title)}`}>
-                Request API access
+                {shell.heroSecondaryCta}
               </a>
             </div>
           </div>
@@ -211,9 +233,7 @@ export default function SolutionPage(props: SolutionPageProps): JSX.Element {
         <section className={clsx(styles.section, styles.sectionAlt)}>
           <div className="container">
             <h2 className={styles.sectionTitle}>{benefitsHeading}</h2>
-            <p className={styles.sectionSubtitle}>
-              The capabilities partners ship on day one.
-            </p>
+            <p className={styles.sectionSubtitle}>{shell.benefitsSubtitle}</p>
             <div className={styles.benefitGrid}>
               {props.benefits.map((b) => (
                 <article key={b.title} className={styles.benefitCard}>
@@ -230,19 +250,15 @@ export default function SolutionPage(props: SolutionPageProps): JSX.Element {
           <div className="container">
             <div className={styles.codeGrid}>
               <div>
-                <span className={styles.kicker}>Integration</span>
-                <h2 className={styles.sectionTitle}>One REST call, multimodal results</h2>
-                <p className={styles.lead}>
-                  The same endpoint powers every Tictactrip integration. Authenticate, send a search
-                  payload, and receive itineraries with price, duration, carrier and CO₂ emissions.
-                  Then book through <code>/book</code> and deliver tickets to your users.
-                </p>
+                <span className={styles.kicker}>{shell.integrationKicker}</span>
+                <h2 className={styles.sectionTitle}>{shell.integrationHeading}</h2>
+                <p className={styles.lead}>{shell.integrationCopy}</p>
                 <div className={styles.heroCtas}>
                   <Link className={clsx('button button--lg', styles.btnPrimary)} to="/docs/intro">
-                    Start the tutorial
+                    {shell.startTutorialCta}
                   </Link>
                   <Link className={clsx('button button--lg', styles.btnGhost)} to="/api">
-                    Browse the API reference
+                    {shell.apiReferenceCta}
                   </Link>
                 </div>
               </div>
@@ -261,10 +277,8 @@ export default function SolutionPage(props: SolutionPageProps): JSX.Element {
 
         <section className={clsx(styles.section, styles.sectionAlt)} id="faq">
           <div className="container">
-            <h2 className={styles.sectionTitle}>Frequently asked questions</h2>
-            <p className={styles.sectionSubtitle}>
-              The points product and engineering teams check before integrating.
-            </p>
+            <h2 className={styles.sectionTitle}>{shell.faqHeading}</h2>
+            <p className={styles.sectionSubtitle}>{shell.faqSubtitle}</p>
             <div className={styles.faqList}>
               {props.faqs.map((item) => (
                 <details key={item.q} className={styles.faqItem}>
@@ -294,18 +308,16 @@ export default function SolutionPage(props: SolutionPageProps): JSX.Element {
 
         <section className={clsx(styles.section, styles.sectionCta)}>
           <div className="container">
-            <h2 className={styles.ctaTitle}>Ready to integrate Tictactrip?</h2>
-            <p className={styles.ctaLead}>
-              Tell us about your project and we'll come back within one business day with a tailored plan.
-            </p>
+            <h2 className={styles.ctaTitle}>{shell.ctaHeading}</h2>
+            <p className={styles.ctaLead}>{shell.ctaLead}</p>
             <div className={styles.heroCtas}>
               <a
                 className={clsx('button button--lg', styles.btnPrimary)}
                 href={`mailto:${SALES_EMAIL}?subject=Tictactrip%20API%20-%20${encodeURIComponent(props.title)}`}>
-                Contact sales
+                {shell.contactSalesCta}
               </a>
               <Link className={clsx('button button--lg', styles.btnSecondary)} to="/">
-                Back to homepage
+                {shell.backToHomeCta}
               </Link>
             </div>
           </div>
