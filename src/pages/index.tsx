@@ -10,7 +10,7 @@ import styles from './index.module.css';
 
 const SALES_EMAIL = 'sales@tictactrip.eu';
 const DEV_EMAIL = 'dev@tictactrip.eu';
-const SITE_URL = 'https://api.tictactrip.eu';
+const SITE_URL = 'https://developers.tictactrip.eu';
 
 const OG_LOCALE: Record<Locale, string> = {
   en: 'en_US',
@@ -300,7 +300,7 @@ function StructuredData() {
     '@type': 'Organization',
     name: 'Tictactrip',
     url: 'https://www.tictactrip.eu/',
-    logo: 'https://api.tictactrip.eu/img/logoTextBlack.svg',
+    logo: `${SITE_URL}/img/logoTextBlack.svg`,
     sameAs: ['https://www.tictactrip.eu/', 'https://github.com/tictactrip'],
     contactPoint: [
       {
@@ -366,12 +366,17 @@ function StructuredData() {
       <link rel="canonical" href={canonical} />
       <meta name="description" content={t.meta.description} />
       <meta name="keywords" content={t.meta.keywords} />
+      <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+      <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1" />
       <meta property="og:type" content="website" />
       <meta property="og:title" content={t.meta.ogTitle} />
       <meta property="og:description" content={t.meta.ogDescription} />
       <meta property="og:url" content={canonical} />
       <meta property="og:locale" content={OG_LOCALE[locale]} />
+      <meta property="og:site_name" content="Tictactrip Documentation" />
       <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" content={t.meta.ogTitle} />
+      <meta name="twitter:description" content={t.meta.ogDescription} />
       <script type="application/ld+json">{JSON.stringify(webpage)}</script>
       <script type="application/ld+json">{JSON.stringify(organization)}</script>
       <script type="application/ld+json">{JSON.stringify(product)}</script>

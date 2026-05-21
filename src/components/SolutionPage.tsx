@@ -9,7 +9,7 @@ import {solutionShell} from '../i18n/content/solutionShell';
 import styles from './SolutionPage.module.css';
 
 const SALES_EMAIL = 'sales@tictactrip.eu';
-const SITE_URL = 'https://api.tictactrip.eu';
+const SITE_URL = 'https://developers.tictactrip.eu';
 
 const OG_LOCALE: Record<Locale, string> = {
   en: 'en_US',
@@ -166,7 +166,8 @@ export default function SolutionPage(props: SolutionPageProps): JSX.Element {
         <link rel="canonical" href={canonical} />
         <meta name="description" content={props.metaDescription} />
         <meta name="keywords" content={props.keywords} />
-        <meta name="robots" content="index, follow, max-image-preview:large" />
+        <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+        <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1" />
         <meta property="og:type" content="website" />
         <meta property="og:title" content={props.metaTitle} />
         <meta property="og:description" content={props.metaDescription} />
