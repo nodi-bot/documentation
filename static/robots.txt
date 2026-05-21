@@ -1,0 +1,6 @@
+# Allow all crawlers to index everything
+User-agent: *
+Allow: /
+
+# Sitemap location (multilingual, includes hreflang alternates)
+Sitemap: https://developers.tictactrip.eu/sitemap.xml

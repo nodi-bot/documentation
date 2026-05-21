@@ -13,7 +13,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const SITE_URL = 'https://api.tictactrip.eu';
+const SITE_URL = 'https://developers.tictactrip.eu';
 
 const LOCALES = ['en', 'fr', 'de', 'es', 'it', 'pt', 'ru'];
 
