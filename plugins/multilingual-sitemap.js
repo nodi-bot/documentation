@@ -13,7 +13,11 @@
 const fs = require('fs');
 const path = require('path');
 
-const SITE_URL = 'https://developers.tictactrip.eu';
+// Fallback only. The real value is derived at build time from the Docusaurus
+// config (`siteConfig.url`) so the sitemap host can never silently drift away
+// from the deployed domain — a mismatch there makes Google Search Console
+// reject the sitemap with "Sitemap could not be read".
+const DEFAULT_SITE_URL = 'https://developers.tictactrip.eu';
 
 const LOCALES = ['en', 'fr', 'de', 'es', 'it', 'pt', 'ru'];
 
@@ -63,9 +67,9 @@ const PAGES = [
   {path: '/docs/glossary', priority: 0.6, changefreq: 'monthly'},
 ];
 
-function urlFor(locale, urlPath) {
+function urlFor(siteUrl, locale, urlPath) {
   const prefix = locale === 'en' ? '' : `/${locale}`;
-  return `${SITE_URL}${prefix}${urlPath}`;
+  return `${siteUrl}${prefix}${urlPath}`;
 }
 
 function escapeXml(s) {
@@ -82,13 +86,13 @@ function escapeXml(s) {
  * @param {string} locale
  * @param {string} lastmod
  */
-function buildEntry(page, locale, lastmod) {
-  const loc = escapeXml(urlFor(locale, page.path));
+function buildEntry(siteUrl, page, locale, lastmod) {
+  const loc = escapeXml(urlFor(siteUrl, locale, page.path));
   const alternates = LOCALES.map(
     (l) =>
-      `    <xhtml:link rel="alternate" hreflang="${HREFLANG[l]}" href="${escapeXml(urlFor(l, page.path))}"/>`,
+      `    <xhtml:link rel="alternate" hreflang="${HREFLANG[l]}" href="${escapeXml(urlFor(siteUrl, l, page.path))}"/>`,
   ).join('\n');
-  const xdefault = `    <xhtml:link rel="alternate" hreflang="x-default" href="${escapeXml(urlFor('en', page.path))}"/>`;
+  const xdefault = `    <xhtml:link rel="alternate" hreflang="x-default" href="${escapeXml(urlFor(siteUrl, 'en', page.path))}"/>`;
   return `  <url>
     <loc>${loc}</loc>
     <lastmod>${lastmod}</lastmod>
@@ -102,13 +106,18 @@ ${xdefault}
 module.exports = function pluginMultilingualSitemap() {
   return {
     name: 'multilingual-sitemap',
-    async postBuild({outDir}) {
+    async postBuild({siteConfig, outDir}) {
       const lastmod = new Date().toISOString().slice(0, 10);
+
+      // Derive the host from the Docusaurus config so it always matches the
+      // deployed domain (and the Search Console property). Strip any trailing
+      // slash — page paths already start with "/".
+      const siteUrl = ((siteConfig && siteConfig.url) || DEFAULT_SITE_URL).replace(/\/+$/, '');
 
       const urls = [];
       for (const page of PAGES) {
         for (const locale of LOCALES) {
-          urls.push(buildEntry(page, locale, lastmod));
+          urls.push(buildEntry(siteUrl, page, locale, lastmod));
         }
       }
 
